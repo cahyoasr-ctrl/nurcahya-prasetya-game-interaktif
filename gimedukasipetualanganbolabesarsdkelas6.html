@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Gerak Dasar Bola Besar - Kelas 6 SD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Poppins & Fredoka) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Fredoka', 'Poppins', sans-serif;
+            user-select: none;
+        }
+        body {
+            background: linear-gradient(180deg, #38ef7d 0%, #11998e 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        canvas {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-radius: 16px;
+            background: linear-gradient(to bottom, #70e1f5, #ffd194);
+        }
+        .btn-bounce {
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 4px solid #f6d365;
+        }
+        /* Style Kartu Memory Game */
+        .card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            border-radius: 12px;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-2 sm:p-4 text-slate-800 min-h-screen">
+
+    <!-- Container Utama App -->
+    <div id="app" class="w-full max-w-4xl flex flex-col items-center">
+
+        <!-- HEADER / NAVIGATION -->
+        <header class="w-full bg-white/80 backdrop-blur border-b-4 border-yellow-400 rounded-2xl p-3 mb-3 shadow-lg flex justify-between items-center px-6">
+            <div class="flex items-center gap-3">
+                <div class="bg-yellow-400 text-amber-900 p-2 rounded-xl text-xl font-bold shadow-md">
+                    <i class="fa-solid fa-volleyball"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold text-teal-800 tracking-wide">PETUALANGAN BOLA BESAR</h1>
+                    <p class="text-xs text-teal-600 font-semibold">PJOK Kelas 6 SD - Bab 1: Variasi & Kombinasi Gerak Dasar</p>
+                </div>
+            </div>
+            <div id="userInfoDisplay" class="hidden text-right">
+                <p id="displayStudentName" class="font-bold text-amber-600 text-sm sm:text-base">Siswa: -</p>
+                <p id="displayStudentClass" class="text-xs text-gray-500 font-bold">Kelas: -</p>
+            </div>
+        </header>
+
+        <!-- SCREEN 1: FORM IDENTITAS SISWA -->
+        <div id="screenIdentity" class="w-full glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl text-center max-w-md my-auto">
+            <div class="mb-4">
+                <span class="text-6xl text-amber-500 animate-bounce inline-block"><i class="fa-solid fa-umbrella-beach"></i></span>
+            </div>
+            <h2 class="text-2xl font-bold text-teal-800 mb-2">Selamat Datang, Juara!</h2>
+            <p class="text-gray-600 text-sm mb-6">Masukkan data diri terlebih dahulu sebelum memulai petualangan di Pantai Belajar!</p>
+            
+            <form id="identityForm" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-teal-700 uppercase mb-1">Nama Lengkap Siswa</label>
+                    <input type="text" id="inputName" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-3 rounded-xl border-2 border-teal-300 focus:border-yellow-400 focus:outline-none transition font-semibold text-gray-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-teal-700 uppercase mb-1">Kelas</label>
+                    <select id="inputClass" required class="w-full px-4 py-3 rounded-xl border-2 border-teal-300 focus:border-yellow-400 focus:outline-none transition font-semibold text-gray-700">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="6A">Kelas 6 - A</option>
+                        <option value="6B">Kelas 6 - B</option>
+                        <option value="6C">Kelas 6 - C</option>
+                        <option value="6D">Kelas 6 - D</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-bold py-3.5 rounded-xl shadow-lg border-b-4 border-amber-700 btn-bounce text-lg mt-4 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> Mulai Petualangan
+                </button>
+            </form>
+        </div>
+
+        <!-- SCREEN 2: LEVEL SELECT / DASHBOARD -->
+        <div id="screenLevelSelect" class="hidden w-full glass-panel rounded-3xl p-6 shadow-2xl text-center">
+            <h2 class="text-2xl font-bold text-teal-800 mb-1">Pilih Tingkat Petualangan</h2>
+            <p class="text-xs text-teal-600 mb-6">Selesaikan setiap tantangan untuk mengumpulkan skor tertinggi!</p>
+
+            <!-- Score board Header -->
+            <div class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 mb-6 flex justify-around items-center">
+                <div class="text-center">
+                    <p class="text-xs text-amber-700 font-bold uppercase">Total Skor Anda</p>
+                    <p id="totalScoreText" class="text-3xl font-extrabold text-amber-600">0</p>
+                </div>
+                <div class="h-10 w-1 bg-amber-300 rounded-full"></div>
+                <div class="text-center">
+                    <p class="text-xs text-amber-700 font-bold uppercase">Status Petualangan</p>
+                    <p id="adventureStatusText" class="text-sm font-bold text-teal-700">Level 1 Terbuka</p>
+                </div>
+            </div>
+
+            <!-- Level Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Level 1 Card -->
+                <div id="levelCard1" class="border-4 border-teal-400 bg-teal-50 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md relative overflow-hidden">
+                    <span class="absolute top-2 right-2 bg-teal-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">Level 1</span>
+                    <div class="text-4xl text-teal-600 my-3"><i class="fa-solid fa-futbol"></i></div>
+                    <h3 class="font-bold text-teal-900 text-lg">Tantangan Sepak Bola</h3>
+                    <p class="text-xs text-teal-700 my-2">Lompati rintangan pantai, kumpulkan bola, & jawab Kuis HOTS Sepak Bola!</p>
+                    <button onclick="startLevel(1)" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 rounded-xl border-b-4 border-teal-700 btn-bounce text-sm mt-2">
+                        Mainkan Level 1
+                    </button>
+                </div>
+
+                <!-- Level 2 Card -->
+                <div id="levelCard2" class="border-4 border-gray-300 bg-gray-100 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md opacity-60 relative overflow-hidden">
+                    <span class="absolute top-2 right-2 bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">Level 2</span>
+                    <div class="text-4xl text-gray-400 my-3"><i class="fa-solid fa-volleyball"></i></div>
+                    <h3 class="font-bold text-gray-700 text-lg">Mengingat Bola Voli</h3>
+                    <p class="text-xs text-gray-500 my-2">Uji daya ingatmu mencocokkan pasangan variasi gerak bola voli!</p>
+                    <button id="btnLevel2" disabled onclick="startLevel(2)" class="w-full bg-gray-400 text-white font-bold py-2 rounded-xl border-b-4 border-gray-600 cursor-not-allowed text-sm mt-2">
+                        Terkunci
+                    </button>
+                </div>
+
+                <!-- Level 3 Card -->
+                <div id="levelCard3" class="border-4 border-gray-300 bg-gray-100 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md opacity-60 relative overflow-hidden">
+                    <span class="absolute top-2 right-2 bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">Level 3</span>
+                    <div class="text-4xl text-gray-400 my-3"><i class="fa-solid fa-basketball"></i></div>
+                    <h3 class="font-bold text-gray-700 text-lg">Master Bola Basket</h3>
+                    <p class="text-xs text-gray-500 my-2">Jelajahi pantai, dribble bola, & jawab kuis HOTS Kompleks Basket!</p>
+                    <button id="btnLevel3" disabled onclick="startLevel(3)" class="w-full bg-gray-400 text-white font-bold py-2 rounded-xl border-b-4 border-gray-600 cursor-not-allowed text-sm mt-2">
+                        Terkunci
+                    </button>
+                </div>
+            </div>
+
+            <!-- Download Certificate Button (Visible when all completed) -->
+            <div id="certificateSection" class="hidden bg-gradient-to-r from-yellow-300 to-amber-400 p-4 rounded-2xl border-2 border-yellow-500 text-center">
+                <p class="font-bold text-amber-900 text-base mb-1">🎉 Selamat! Kamu telah menyelesaikan semua level!</p>
+                <p class="text-xs text-amber-800 mb-3">Unduh sertifikat kelulusanmu sebagai bukti keahlian materi Bola Besar.</p>
+                <button onclick="showCertificateModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg border-b-4 border-amber-900 btn-bounce inline-flex items-center gap-2">
+                    <i class="fa-solid fa-certificate text-yellow-300"></i> Unduh Sertifikat
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: GAMEPLAY CANVAS PLATFORMER (LEVEL 1 & 3) -->
+        <div id="screenPlatformer" class="hidden w-full flex flex-col items-center">
+            <!-- Game Info Overlay -->
+            <div class="w-full bg-white/90 rounded-2xl p-3 mb-2 flex justify-between items-center shadow border-2 border-yellow-300 text-sm font-bold">
+                <div class="flex items-center gap-2 text-teal-800">
+                    <i class="fa-solid fa-flag-checkered"></i> <span id="gameLevelTitle">Level 1: Sepak Bola</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-amber-600"><i class="fa-solid fa-star text-yellow-400"></i> Skor: <span id="currentLevelScore">0</span></span>
+                    <span class="text-rose-600"><i class="fa-solid fa-heart"></i> Nyawa: <span id="livesDisplay">3</span></span>
+                </div>
+            </div>
+
+            <!-- Canvas Game -->
+            <div class="relative w-full flex justify-center">
+                <canvas id="gameCanvas" width="800" height="400" class="w-full max-w-full h-auto border-4 border-white"></canvas>
+            </div>
+
+            <!-- Controls for Touch/Mobile -->
+            <div class="w-full max-w-2xl mt-3 flex justify-between items-center px-4">
+                <div class="flex gap-2">
+                    <button id="btnLeft" class="bg-amber-400 active:bg-amber-500 text-white text-2xl w-14 h-14 rounded-2xl shadow-lg border-b-4 border-amber-600 flex items-center justify-center select-none">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <button id="btnRight" class="bg-amber-400 active:bg-amber-500 text-white text-2xl w-14 h-14 rounded-2xl shadow-lg border-b-4 border-amber-600 flex items-center justify-center select-none">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="text-center text-xs text-white bg-black/30 px-3 py-1 rounded-lg hidden sm:block">
+                    Gunakan Keyboard: ⬅️ ➡️ atau A/D untuk Jalan, SPASI untuk Melompat
+                </div>
+                <div>
+                    <button id="btnJump" class="bg-teal-500 active:bg-teal-600 text-white text-xl font-bold px-6 h-14 rounded-2xl shadow-lg border-b-4 border-teal-700 flex items-center justify-center select-none gap-1">
+                        <i class="fa-solid fa-arrow-up"></i> LOMPAT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: MEMORY GAME (LEVEL 2) -->
+        <div id="screenMemory" class="hidden w-full glass-panel rounded-3xl p-6 shadow-2xl text-center">
+            <div class="flex justify-between items-center mb-4 border-b-2 border-yellow-200 pb-3">
+                <div class="text-left">
+                    <h2 class="text-xl font-bold text-teal-800">Level 2: Memory Game Bola Voli</h2>
+                    <p class="text-xs text-teal-600">Cocokkan istilah Variasi & Kombinasi Gerak Bola Voli!</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">Percobaan: <span id="memoryMoves" class="font-bold text-teal-700">0</span></p>
+                    <p class="text-sm font-bold text-amber-600">Skor: <span id="memoryScore">0</span></p>
+                </div>
+            </div>
+
+            <!-- Memory Board -->
+            <div id="memoryBoard" class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto mb-4">
+                <!-- Dynamic memory cards will be generated here -->
+            </div>
+        </div>
+
+        <!-- MODAL: KUIS HOTS (PILIHAN GANDA KOMPLEKS) -->
+        <div id="quizModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border-4 border-yellow-400 relative">
+                <div class="flex items-center gap-2 text-amber-600 font-bold text-sm mb-2">
+                    <i class="fa-solid fa-brain text-xl"></i> TANTANGAN KUIS HOTS (Pilihan Ganda Kompleks)
+                </div>
+                <h3 id="quizQuestion" class="font-bold text-slate-800 text-base sm:text-lg mb-2">Pertanyaan Kuis...</h3>
+                <p class="text-xs text-teal-600 font-semibold mb-4"><i class="fa-solid fa-circle-info"></i> Pilih <strong>SEMUA</strong> jawaban yang benar (Bisa lebih dari satu)!</p>
+
+                <!-- Options -->
+                <div id="quizOptions" class="space-y-2 mb-6">
+                    <!-- Dynamic options checkboxes -->
+                </div>
+
+                <div id="quizFeedback" class="hidden mb-4 p-3 rounded-xl text-xs font-bold text-center"></div>
+
+                <button id="btnSubmitQuiz" onclick="submitQuizAnswer()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-xl shadow-md border-b-4 border-teal-700 btn-bounce text-sm">
+                    Kirim Jawaban
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL: SERTIFIKAT KELULUSAN -->
+        <div id="certificateModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-50 hidden">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 max-w-2xl w-full shadow-2xl relative border-4 border-yellow-400 overflow-y-auto max-h-[90vh]">
+                <button onclick="closeCertificateModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+                
+                <!-- Printable Certificate Container -->
+                <div id="certificateArea" class="border-8 border-double border-teal-600 p-6 bg-amber-50 rounded-xl text-center relative overflow-hidden">
+                    <!-- Background Watermark -->
+                    <div class="absolute inset-0 opacity-5 flex items-center justify-center pointer-events-none">
+                        <i class="fa-solid fa-award text-[180px] text-teal-800"></i>
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-teal-700 text-xs font-bold uppercase tracking-wider">Pendidikan Jasmani Olahraga & Kesehatan</span>
+                            <span class="text-amber-600 text-xs font-bold">SD NEGERI UTAMA</span>
+                        </div>
+                        
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-teal-900 my-2 font-serif uppercase tracking-wide">SERTIFIKAT KELULUSAN</h1>
+                        <p class="text-xs text-amber-800 font-semibold">Diberikan sebagai penghargaan atas ketuntasan pembelajaran materi:</p>
+                        <p class="text-sm font-bold text-teal-700 underline my-1">Bab 1: Variasi dan Kombinasi Gerak Dasar Permainan Bola Besar</p>
+
+                        <p class="text-xs text-gray-500 mt-4">Diberikan Kepada Siswa Hebat:</p>
+                        <h2 id="certStudentName" class="text-2xl sm:text-3xl font-bold text-amber-600 my-1 font-sans">NAMA SISWA</h2>
+                        <p id="certStudentClass" class="text-xs font-bold text-teal-800 mb-4">Kelas: VI-A</p>
+
+                        <div class="bg-white/80 border border-teal-200 rounded-lg p-3 max-w-sm mx-auto mb-4 text-xs shadow-sm">
+                            <div class="flex justify-between mb-1">
+                                <span>Total Poin Prestasi:</span>
+                                <span id="certTotalScore" class="font-bold text-amber-600">0 Poin</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Predikat Mastery:</span>
+                                <span class="font-bold text-teal-700">SANGAT BAIK (EXCELLENT)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-end mt-6 text-xs text-gray-600">
+                            <div class="text-left">
+                                <p id="certDate">Tanggal: 29 Oktober 2026</p>
+                                <p class="font-bold text-teal-800 mt-1">Guru PJOK Kelas 6</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 mx-auto mb-1 rounded-full bg-yellow-400 border-2 border-amber-600 flex items-center justify-center text-amber-900 text-2xl shadow-inner">
+                                    <i class="fa-solid fa-award"></i>
+                                </div>
+                                <span class="text-[10px] text-amber-800 font-bold">LULUS VERIFIKASI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="mt-4 flex gap-3 justify-end">
+                    <button onclick="downloadCertificate()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 rounded-xl shadow border-b-4 border-teal-800 btn-bounce text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Unduh / Cetak Sertifikat
+                    </button>
+                    <button onclick="closeCertificateModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold px-4 py-2.5 rounded-xl shadow border-b-4 border-gray-600 btn-bounce text-sm">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: ALERT MESSAGE -->
+        <div id="alertModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-2xl p-5 max-w-sm w-full shadow-xl text-center border-4 border-yellow-400">
+                <div id="alertIcon" class="text-4xl text-amber-500 mb-2"><i class="fa-solid fa-circle-info"></i></div>
+                <h3 id="alertTitle" class="font-bold text-gray-800 text-lg mb-1">Pemberitahuan</h3>
+                <p id="alertMessage" class="text-xs text-gray-600 mb-4">Pesan alert di sini...</p>
+                <button onclick="closeAlertModal()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 rounded-xl border-b-4 border-teal-700 btn-bounce text-sm">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT GAME LOGIC -->
+    <script>
+        // --- GLOBAL GAME STATE ---
+        let studentData = { name: '', class: '' };
+        let scores = { level1: 0, level2: 0, level3: 0 };
+        let completedLevels = { level1: false, level2: false, level3: false };
+        let currentLevel = 1;
+
+        // --- QUIZ DATA (HOTS PILIHAN GANDA KOMPLEKS) ---
+        const quizData = {
+            level1: {
+                question: "Siswa kelas 6 sedang melakukan variasi dan kombinasi gerak dasar lokomotor dan manipulatif dalam Sepak Bola. Manakah kombinasi yang TEPAT di bawah ini?",
+                options: [
+                    { id: 'a', text: "Berlari mengejar bola lalu menendang bola ke arah gawang (Kombinasi Lokomotor & Manipulatif)", correct: true },
+                    { id: 'b', text: "Berdiri tegak meliukkan badan tanpa bola (Kombinasi Lokomotor)", correct: false },
+                    { id: 'c', text: "Mendorong rekan setim saat berebut bola", correct: false },
+                    { id: 'd', text: "Melompat sambil menyundul bola yang melayang di udara (Kombinasi Lokomotor & Manipulatif)", correct: true }
+                ]
+            },
+            level3: {
+                question: "Dalam permainan Bola Basket, seorang pemain melakukan serangan dengan mengiringi bola (dribble) lalu melakukan operan dada (chest pass). Gerakan ini mencakup:",
+                options: [
+                    { id: 'a', text: "Berjalan/berlari memantulkan bola merupakan variasi gerak lokomotor dan manipulatif", correct: true },
+                    { id: 'b', text: "Melakukan chest pass merupakan kombinasi gerak non-lokomotor dan manipulatif", correct: true },
+                    { id: 'c', text: "Menghentikan bola dengan menangkapnya adalah gerak non-lokomotor murni", correct: false },
+                    { id: 'd', text: "Gerakan melompat saat melakukan shoot/lay-up memasukkan bola ke ring", correct: true }
+                ]
+            }
+        };
+
+        // --- MEMORY GAME DATA (LEVEL 2 - BOLA VOLI) ---
+        const memoryCardsData = [
+            { id: 1, text: "Passing Bawah", icon: "fa-hands" },
+            { id: 1, text: "Passing Bawah", icon: "fa-hands" },
+            { id: 2, text: "Passing Atas", icon: "fa-hand-holding" },
+            { id: 2, text: "Passing Atas", icon: "fa-hand-holding" },
+            { id: 3, text: "Servis Bawah", icon: "fa-volleyball" },
+            { id: 3, text: "Servis Bawah", icon: "fa-volleyball" },
+            { id: 4, text: "Smash / Smes", icon: "fa-bolt" },
+            { id: 4, text: "Smash / Smes", icon: "fa-bolt" }
+        ];
+
+        // --- INITIALIZATION & FORM HANDLING ---
+        document.getElementById('identityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value.trim();
+            const studentClass = document.getElementById('inputClass').value;
+
+            if (!name || !studentClass) {
+                customAlert("Peringatan", "Harap isi nama dan pilih kelas terlebih dahulu!");
+                return;
+            }
+
+            studentData.name = name;
+            studentData.class = studentClass;
+
+            document.getElementById('displayStudentName').innerText = `Siswa: ${studentData.name}`;
+            document.getElementById('displayStudentClass').innerText = `Kelas: ${studentData.class}`;
+            document.getElementById('userInfoDisplay').classList.remove('hidden');
+
+            // Switch to Level Select Screen
+            showScreen('screenLevelSelect');
+            updateDashboard();
+        });
+
+        function showScreen(screenId) {
+            document.getElementById('screenIdentity').classList.add('hidden');
+            document.getElementById('screenLevelSelect').classList.add('hidden');
+            document.getElementById('screenPlatformer').classList.add('hidden');
+            document.getElementById('screenMemory').classList.add('hidden');
+
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function updateDashboard() {
+            const total = scores.level1 + scores.level2 + scores.level3;
+            document.getElementById('totalScoreText').innerText = total;
+
+            // Level 2 Unlock Check
+            if (completedLevels.level1) {
+                const l2Card = document.getElementById('levelCard2');
+                const btnL2 = document.getElementById('btnLevel2');
+                l2Card.classList.remove('opacity-60', 'bg-gray-100', 'border-gray-300');
+                l2Card.classList.add('bg-amber-50', 'border-amber-400');
+                btnL2.disabled = false;
+                btnL2.innerText = "Mainkan Level 2";
+                btnL2.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                btnL2.classList.add('bg-amber-500', 'hover:bg-amber-600', 'border-amber-700');
+            }
+
+            // Level 3 Unlock Check
+            if (completedLevels.level2) {
+                const l3Card = document.getElementById('levelCard3');
+                const btnL3 = document.getElementById('btnLevel3');
+                l3Card.classList.remove('opacity-60', 'bg-gray-100', 'border-gray-300');
+                l3Card.classList.add('bg-orange-50', 'border-orange-400');
+                btnL3.disabled = false;
+                btnL3.innerText = "Mainkan Level 3";
+                btnL3.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                btnL3.classList.add('bg-orange-500', 'hover:bg-orange-600', 'border-orange-700');
+            }
+
+            // Certificate Section Check
+            if (completedLevels.level1 && completedLevels.level2 && completedLevels.level3) {
+                document.getElementById('certificateSection').classList.remove('hidden');
+                document.getElementById('adventureStatusText').innerText = "Semua Level Tuntas!";
+            } else {
+                if (completedLevels.level2) {
+                    document.getElementById('adventureStatusText').innerText = "Level 3 Terbuka";
+                } else if (completedLevels.level1) {
+                    document.getElementById('adventureStatusText').innerText = "Level 2 Terbuka";
+                }
+            }
+        }
+
+        // --- PLATFORMER ENGINE (CANVAS GAME FOR LEVEL 1 & 3) ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let animationFrameId;
+        let player = {
+            x: 50,
+            y: 280,
+            width: 36,
+            height: 48,
+            vx: 0,
+            vy: 0,
+            speed: 4,
+            jumpPower: -11.5,
+            isGrounded: false
+        };
+
+        let keys = { left: false, right: false, up: false };
+        let gravity = 0.55;
+        let platforms = [];
+        let items = [];
+        let obstacles = [];
+        let goalPost = { x: 730, y: 220, width: 40, height: 80 };
+        let currentLives = 3;
+        let gameScore = 0;
+
+        function initPlatformerLevel(lvl) {
+            currentLevel = lvl;
+            currentLives = 3;
+            gameScore = 0;
+            player.x = 50;
+            player.y = 280;
+            player.vx = 0;
+            player.vy = 0;
+
+            document.getElementById('gameLevelTitle').innerText = lvl === 1 ? "Level 1: Sepak Bola Pantai" : "Level 3: Master Bola Basket";
+            document.getElementById('currentLevelScore').innerText = gameScore;
+            document.getElementById('livesDisplay').innerText = currentLives;
+
+            // Generate Platforms
+            platforms = [
+                { x: 0, y: 360, width: 800, height: 40 }, // Main Ground (Pantai)
+                { x: 150, y: 280, width: 120, height: 18 },
+                { x: 320, y: 220, width: 140, height: 18 },
+                { x: 520, y: 270, width: 130, height: 18 }
+            ];
+
+            // Generate Item Collections (Balls)
+            const ballType = lvl === 1 ? 'soccer' : 'basketball';
+            items = [
+                { x: 180, y: 240, collected: false, type: ballType },
+                { x: 230, y: 240, collected: false, type: ballType },
+                { x: 360, y: 180, collected: false, type: ballType },
+                { x: 410, y: 180, collected: false, type: ballType },
+                { x: 560, y: 230, collected: false, type: ballType }
+            ];
+
+            // Obstacles (Crabs / Beach Rocks)
+            obstacles = [
+                { x: 270, y: 335, width: 30, height: 25 },
+                { x: 480, y: 335, width: 30, height: 25 }
+            ];
+
+            // Goal
+            goalPost = { x: 720, y: 280, width: 50, height: 80 };
+
+            showScreen('screenPlatformer');
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop();
+        }
+
+        // Event Listeners for Game Controls
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+            if ((e.key === 'ArrowUp' || e.key === ' ' || e.key === 'w') && player.isGrounded) {
+                player.vy = player.jumpPower;
+                player.isGrounded = false;
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+        });
+
+        // Touch Control Bindings
+        const setupTouchBtn = (btnId, keyName) => {
+            const btn = document.getElementById(btnId);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+            btn.addEventListener('mousedown', () => keys[keyName] = true);
+            btn.addEventListener('mouseup', () => keys[keyName] = false);
+        };
+
+        setupTouchBtn('btnLeft', 'left');
+        setupTouchBtn('btnRight', 'right');
+        document.getElementById('btnJump').addEventListener('click', () => {
+            if (player.isGrounded) {
+                player.vy = player.jumpPower;
+                player.isGrounded = false;
+            }
+        });
+
+        function gameLoop() {
+            updatePlatformer();
+            renderPlatformer();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function updatePlatformer() {
+            // Horizontal Movement
+            if (keys.left) player.vx = -player.speed;
+            else if (keys.right) player.vx = player.speed;
+            else player.vx = 0;
+
+            player.x += player.vx;
+
+            // Canvas Bounds
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // Gravity & Vertical Movement
+            player.vy += gravity;
+            player.y += player.vy;
+
+            // Platform Collision Detection
+            player.isGrounded = false;
+            platforms.forEach(plat => {
+                if (player.x < plat.x + plat.width &&
+                    player.x + player.width > plat.x &&
+                    player.y + player.height >= plat.y &&
+                    player.y + player.height <= plat.y + plat.height + player.vy) {
+                    
+                    if (player.vy >= 0) {
+                        player.y = plat.y - player.height;
+                        player.vy = 0;
+                        player.isGrounded = true;
+                    }
+                }
+            });
+
+            // Items Collision (Collecting Balls)
+            items.forEach(item => {
+                if (!item.collected) {
+                    const dist = Math.hypot((player.x + player.width/2) - item.x, (player.y + player.height/2) - item.y);
+                    if (dist < 25) {
+                        item.collected = true;
+                        gameScore += 20;
+                        document.getElementById('currentLevelScore').innerText = gameScore;
+                    }
+                }
+            });
+
+            // Obstacle Collision
+            obstacles.forEach(obs => {
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
+                    
+                    // Hit Obstacle
+                    currentLives--;
+                    document.getElementById('livesDisplay').innerText = currentLives;
+                    player.x = Math.max(0, player.x - 60);
+                    player.vy = -5;
+
+                    if (currentLives <= 0) {
+                        cancelAnimationFrame(animationFrameId);
+                        customAlert("Gagal", "Kesempatan habis! Mari coba lagi.", () => {
+                            initPlatformerLevel(currentLevel);
+                        });
+                    }
+                }
+            });
+
+            // Goal Collision (Reached Finish Flag)
+            if (player.x < goalPost.x + goalPost.width &&
+                player.x + player.width > goalPost.x &&
+                player.y < goalPost.y + goalPost.height &&
+                player.y + player.height > goalPost.y) {
+                
+                cancelAnimationFrame(animationFrameId);
+                // Trigger HOTS Quiz Modal
+                openQuizModal(currentLevel);
+            }
+        }
+
+        function renderPlatformer() {
+            // Sky Background Gradient (Beach Sunset/Day)
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, '#87CEEB'); // Light Blue
+            skyGradient.addColorStop(0.7, '#FFE4B5'); // Warm Beach Sun
+            skyGradient.addColorStop(1, '#F4A460'); // Sandy shore reflection
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Ocean Water Wave at Bottom Background
+            ctx.fillStyle = 'rgba(0, 119, 182, 0.4)';
+            ctx.beginPath();
+            ctx.arc(200, 360, 180, Math.PI, 0);
+            ctx.arc(600, 360, 180, Math.PI, 0);
+            ctx.fill();
+
+            // Draw Platforms (Beach Sand / Wood Blocks)
+            platforms.forEach(plat => {
+                ctx.fillStyle = '#E9C46A'; // Beach Sand Color
+                ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+                ctx.strokeStyle = '#F4A261';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(plat.x, plat.y, plat.width, plat.height);
+            });
+
+            // Draw Collectible Items (Balls)
+            items.forEach(item => {
+                if (!item.collected) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(item.x, item.y, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = item.type === 'soccer' ? '#FFFFFF' : '#E63946';
+                    ctx.fill();
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Ball detail
+                    ctx.beginPath();
+                    ctx.arc(item.x, item.y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = item.type === 'soccer' ? '#000000' : '#E63946';
+                    ctx.fill();
+                    ctx.restore();
+                }
+            });
+
+            // Draw Obstacles (Crabs/Rocks)
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#E63946'; // Red Crab
+                ctx.beginPath();
+                ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 8);
+                ctx.fill();
+                // Eyes
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(obs.x + 4, obs.y + 2, 6, 6);
+                ctx.fillRect(obs.x + 18, obs.y + 2, 6, 6);
+            });
+
+            // Draw Goal Post (Finish Flag)
+            ctx.fillStyle = '#2A9D8F';
+            ctx.fillRect(goalPost.x + 10, goalPost.y, 6, goalPost.height);
+            ctx.fillStyle = '#E76F51';
+            ctx.beginPath();
+            ctx.moveTo(goalPost.x + 16, goalPost.y);
+            ctx.lineTo(goalPost.x + 50, goalPost.y + 20);
+            ctx.lineTo(goalPost.x + 16, goalPost.y + 40);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw Player (Character Mario-style Beach Kid)
+            ctx.fillStyle = '#264653'; // Shorts
+            ctx.fillRect(player.x + 6, player.y + 28, 24, 18);
+
+            ctx.fillStyle = '#F4A261'; // Skin
+            ctx.fillRect(player.x + 8, player.y + 2, 20, 16); // Head
+
+            ctx.fillStyle = '#E76F51'; // Shirt
+            ctx.fillRect(player.x + 4, player.y + 16, 28, 14);
+
+            // Eyes
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(player.x + 18, player.y + 6, 4, 4);
+        }
+
+        // --- LEVEL 2: MEMORY GAME LOGIC ---
+        let memoryFlippedCards = [];
+        let memoryMatchedPairs = 0;
+        let memoryMoves = 0;
+
+        function initMemoryLevel() {
+            currentLevel = 2;
+            memoryFlippedCards = [];
+            memoryMatchedPairs = 0;
+            memoryMoves = 0;
+            document.getElementById('memoryMoves').innerText = memoryMoves;
+            document.getElementById('memoryScore').innerText = 0;
+
+            const board = document.getElementById('memoryBoard');
+            board.innerHTML = '';
+
+            // Shuffle Cards
+            const shuffled = [...memoryCardsData].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card h-28 sm:h-32 rounded-xl';
+                cardEl.dataset.id = card.id;
+                cardEl.dataset.index = index;
+
+                cardEl.innerHTML = `
+                    <div class="card-inner w-full h-full relative shadow-md">
+                        <div class="card-front absolute inset-0 bg-gradient-to-br from-amber-400 to-yellow-500 border-2 border-white flex flex-col items-center justify-center text-white">
+                            <i class="fa-solid fa-volleyball text-3xl mb-1"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-widest">BOLA VOLI</span>
+                        </div>
+                        <div class="card-back absolute inset-0 bg-white border-4 border-teal-500 flex flex-col items-center justify-center p-2 text-center text-teal-800">
+                            <i class="fa-solid ${card.icon} text-2xl text-amber-500 mb-1"></i>
+                            <span class="text-xs font-bold">${card.text}</span>
+                        </div>
+                    </div>
+                `;
+
+                cardEl.addEventListener('click', () => onCardClick(cardEl));
+                board.appendChild(cardEl);
+            });
+
+            showScreen('screenMemory');
+        }
+
+        function onCardClick(cardEl) {
+            if (memoryFlippedCards.length >= 2 || cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) {
+                return;
+            }
+
+            cardEl.classList.add('flipped');
+            memoryFlippedCards.push(cardEl);
+
+            if (memoryFlippedCards.length === 2) {
+                memoryMoves++;
+                document.getElementById('memoryMoves').innerText = memoryMoves;
+                checkMemoryMatch();
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [card1, card2] = memoryFlippedCards;
+            const isMatch = card1.dataset.id === card2.dataset.id;
+
+            if (isMatch) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                memoryMatchedPairs++;
+                memoryFlippedCards = [];
+
+                const score = memoryMatchedPairs * 25;
+                document.getElementById('memoryScore').innerText = score;
+
+                if (memoryMatchedPairs === memoryCardsData.length / 2) {
+                    // Level Completed!
+                    scores.level2 = Math.max(100, 150 - (memoryMoves * 5));
+                    completedLevels.level2 = true;
+                    setTimeout(() => {
+                        customAlert("Luar Biasa!", `Selamat! Kamu menyelesaikan Memory Game Bola Voli dengan Skor: ${scores.level2}`, () => {
+                            showScreen('screenLevelSelect');
+                            updateDashboard();
+                        });
+                    }, 500);
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    memoryFlippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // --- KUIS HOTS MODAL LOGIC ---
+        function openQuizModal(lvl) {
+            const data = lvl === 1 ? quizData.level1 : quizData.level3;
+            document.getElementById('quizQuestion').innerText = data.question;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            data.options.forEach(opt => {
+                const optDiv = document.createElement('label');
+                optDiv.className = 'flex items-center p-3 border-2 border-teal-200 rounded-xl hover:bg-teal-50 cursor-pointer transition';
+                optDiv.innerHTML = `
+                    <input type="checkbox" value="${opt.id}" class="w-5 h-5 text-teal-600 rounded focus:ring-teal-400">
+                    <span class="ml-3 text-xs sm:text-sm font-semibold text-gray-700">${opt.text}</span>
+                `;
+                optionsContainer.appendChild(optDiv);
+            });
+
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('quizModal').classList.remove('hidden');
+        }
+
+        function submitQuizAnswer() {
+            const checkboxes = document.querySelectorAll('#quizOptions input[type="checkbox"]');
+            const selectedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+
+            if (selectedIds.length === 0) {
+                customAlert("Peringatan", "Pilihlah setidaknya satu jawaban yang menurutmu benar!");
+                return;
+            }
+
+            const data = currentLevel === 1 ? quizData.level1 : quizData.level3;
+            const correctIds = data.options.filter(o => o.correct).map(o => o.id);
+
+            // Validate HOTS Complex Multiple Choice
+            const isCorrect = selectedIds.length === correctIds.length && selectedIds.every(id => correctIds.includes(id));
+
+            const feedbackEl = document.getElementById('quizFeedback');
+            feedbackEl.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            if (isCorrect) {
+                feedbackEl.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Jawaban Sempurna! Kamu memahami variasi & kombinasi gerak dengan sangat baik.`;
+
+                const finalLvlScore = gameScore + 50;
+                if (currentLevel === 1) {
+                    scores.level1 = finalLvlScore;
+                    completedLevels.level1 = true;
+                } else if (currentLevel === 3) {
+                    scores.level3 = finalLvlScore;
+                    completedLevels.level3 = true;
+                }
+
+                setTimeout(() => {
+                    document.getElementById('quizModal').classList.add('hidden');
+                    customAlert("Level Selesai!", `Selamat! Kamu berhasil menuntaskan Level ${currentLevel} dengan Skor ${finalLvlScore}!`, () => {
+                        showScreen('screenLevelSelect');
+                        updateDashboard();
+                    });
+                }, 1500);
+
+            } else {
+                feedbackEl.classList.add('bg-rose-100', 'text-rose-800');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Kurang tepat. Perhatikan lagi konsep variasi lokomotor dan manipulatif! Coba lagi.`;
+            }
+        }
+
+        // --- LEVEL CONTROLLER ---
+        function startLevel(lvl) {
+            if (lvl === 1 || lvl === 3) {
+                initPlatformerLevel(lvl);
+            } else if (lvl === 2) {
+                initMemoryLevel();
+            }
+        }
+
+        // --- CERTIFICATE MODAL LOGIC ---
+        function showCertificateModal() {
+            document.getElementById('certStudentName').innerText = studentData.name.toUpperCase();
+            document.getElementById('certStudentClass').innerText = `Kelas: ${studentData.class}`;
+            
+            const total = scores.level1 + scores.level2 + scores.level3;
+            document.getElementById('certTotalScore').innerText = `${total} Poin`;
+
+            const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('certDate').innerText = `Tanggal: ${today}`;
+
+            document.getElementById('certificateModal').classList.remove('hidden');
+        }
+
+        function closeCertificateModal() {
+            document.getElementById('certificateModal').classList.add('hidden');
+        }
+
+        function downloadCertificate() {
+            // Trigger browser print for easy saving as PDF/Image
+            window.print();
+        }
+
+        // --- CUSTOM ALERT DIALOG ---
+        let alertCallback = null;
+        function customAlert(title, message, callback = null) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = message;
+            alertCallback = callback;
+            document.getElementById('alertModal').classList.remove('hidden');
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+            if (alertCallback) {
+                alertCallback();
+                alertCallback = null;
+            }
+        }
+    </script>
+</body>
+</html>
